@@ -69,13 +69,13 @@ function formatPos(pos) {
   const dim = (() => {
     switch (dimId) {
       case 0:
-        return '主世界';
+        return 'overworld';
       case 1:
-        return '地狱';
+        return 'nether';
       case 2:
-        return '末地';
+        return 'end';
       default:
-        return '未知';
+        return 'unknown';
     }
   })();
   return (
@@ -156,14 +156,14 @@ function addWarp(pl_) {
     .addInput('X坐标', strX, strX)
     .addInput('Y坐标', strY, strY)
     .addInput('Z坐标', strZ, strZ)
-    .addDropdown('维度', ['主世界', '地狱', '末地'], dimId_)
+    .addDropdown('Dimensions', ['Overworld', 'nether', 'end'], dimId_)
     .addInput('Warp简介');
   pl_.sendForm(form, (pl, data) => {
     if (data) {
       const [name, x, y, z, dimId, desc] = data;
 
       if (!name) {
-        pl.tell(`${Red}请输入合法内容`);
+        pl.tell(`${Red}Please enter legal content`);
         return;
       }
 
@@ -180,11 +180,11 @@ function addWarp(pl_) {
       setWarpConf(warps);
 
       pl.tell(
-        `${Green}创建Warp ${MinecoinGold}${name} ${Green}成功！\n` +
-          `坐标：${formatPos(pos)}`
+        `${Green}create Warp ${MinecoinGold}${name} ${Green}success！\n` +
+          `coordinate：${formatPos(pos)}`
       );
     } else {
-      pl.tell(`${Red}操作取消`);
+      pl.tell(`${Red}Operation canceled`);
     }
   });
 }
@@ -198,13 +198,13 @@ function confirmBox(pl, tip, callback) {
   pl.sendModalForm(
     '确认',
     tip,
-    `${Green}我想好了`,
-    `${Red}我手滑了`,
+    `${Green}I've thought about it`,
+    `${Red}My hand slipped`,
     (_, res) => {
       if (res) {
         callback();
       } else {
-        pl.tell(`${Red}操作取消`);
+        pl.tell(`${Red}Operation canceled`);
       }
     }
   );
@@ -227,21 +227,21 @@ function deleteWarp(pl, warpObj) {
   const { name, pos } = warpObj;
   confirmBox(
     pl,
-    `真的要删除Warp ${Bold}${MinecoinGold}${name}${Clear}` +
-      `(${formatPos(pos)}${Clear}) 吗？`,
+    `really want to delete Warp ${Bold}${MinecoinGold}${name}${Clear}` +
+      `(${formatPos(pos)}${Clear}) ？`,
     () => {
       const conf = getWarpConf();
       const index = conf.findIndex((x) => compareObject(x, warpObj));
       if (index === -1) {
-        pl.tell(`${Red}Warp不存在！`);
+        pl.tell(`${Red}Warp does not exist！`);
         return;
       }
       conf.splice(index, 1);
       setWarpConf(conf);
 
       pl.tell(
-        `${Green}已删除Warp ${MinecoinGold}${name}\n` +
-          `${Green}坐标： ${formatPos(pos)}`
+        `${Green}warp deleted ${MinecoinGold}${name}\n` +
+          `${Green}coordinate： ${formatPos(pos)}`
       );
     }
   );
@@ -253,8 +253,8 @@ function deleteWarp(pl, warpObj) {
 function deleteWarpForm(pl_) {
   const form = mc
     .newSimpleForm()
-    .setTitle('删除Warp')
-    .setContent('请选择你要删除的Warp');
+    .setTitle('delete delete')
+    .setContent('Please select what you want to delete');
   /** @type {WarpData[]} */
   const playerWarps = [];
   getWarpConf().forEach((it) => {
@@ -293,18 +293,18 @@ function warpList(pl) {
       .newSimpleForm()
       .setTitle('Warp详情')
       .setContent(
-        `- ${DarkGreen}名称： ${Bold}${Green}${name}${Clear}\n` +
-          `- ${DarkGreen}创建者： ` +
+        `- ${DarkGreen}name： ${Bold}${Green}${name}${Clear}\n` +
+          `- ${DarkGreen}creator： ` +
           `${Bold}${Green}${playerName}${Clear}${Green}（${xuid}）${Clear}\n` +
-          `- ${DarkGreen}坐标： ${Bold}${formatPos(pos)}${Clear}\n` +
-          `- ${DarkGreen}创建日期： ` +
+          `- ${DarkGreen}coordinate： ${Bold}${formatPos(pos)}${Clear}\n` +
+          `- ${DarkGreen}Creation date： ` +
           `${Bold}${Green}${formatDate(new Date(date))}${Clear}\n` +
-          `- ${DarkGreen}简介： ${Bold}${Green}${desc || '无'}`
+          `- ${DarkGreen}Introduction： ${Bold}${Green}${desc || 'none'}`
       )
-      .addButton(`${DarkGreen}导航`);
+      .addButton(`${DarkGreen}navigation`);
 
-    if (isOwner) form = form.addButton(`${DarkGreen}删除`);
-    form = form.addButton(`${DarkGreen}返回Warp列表`);
+    if (isOwner) form = form.addButton(`${DarkGreen}delete`);
+    form = form.addButton(`${DarkGreen}Return to Warp list`);
 
     pl_.sendForm(form, (pl__, id) => {
       if (id !== undefined && id !== null) {
@@ -334,7 +334,7 @@ function warpList(pl) {
   const form = mc
     .newSimpleForm()
     .setTitle(pluginName)
-    .setContent(`目前已有 ${Green}${warps.length}${Clear} 个Warp`);
+    .setContent(`Currently there are ${Green}${warps.length}${Clear} Warp`);
   pl.sendForm(addWarpButton(form, warps), (p, i) => {
     if (i !== undefined && i !== null) {
       warpDetail(p, warps[i]);
@@ -349,10 +349,10 @@ function warpManage(pl_) {
   pl_.sendForm(
     mc
       .newSimpleForm()
-      .setTitle('Warp管理')
-      .addButton('添加Warp')
-      .addButton('删除Warp')
-      .addButton('取消导航'),
+      .setTitle('Warp management')
+      .addButton('Add Warp')
+      .addButton('Delete Warp')
+      .addButton('Cancel navigation'),
     (pl, id) => {
       if (id !== undefined && id !== null) {
         switch (id) {
@@ -374,12 +374,12 @@ function warpManage(pl_) {
 
 mc.listen('onServerStarted', () => {
   (() => {
-    const cmd = mc.newCommand('warpmanage', '管理Warp', PermType.Any);
+    const cmd = mc.newCommand('warpmanage', 'Manage Warps', PermType.Any);
     cmd.setAlias('warpm');
 
     cmd.setCallback((_, origin, out) => {
       if (!origin.player) {
-        out.error('该命令只能由玩家执行');
+        out.error('This command can only be executed by the player');
         return false;
       }
       warpManage(origin.player);
@@ -391,12 +391,12 @@ mc.listen('onServerStarted', () => {
   })();
 
   (() => {
-    const cmd = mc.newCommand('warplist', '查看Warp', PermType.Any);
+    const cmd = mc.newCommand('warplist', 'View Warp', PermType.Any);
     cmd.setAlias('warp');
 
     cmd.setCallback((_, origin, out) => {
       if (!origin.player) {
-        out.error('该命令只能由玩家执行');
+        out.error('This command can only be executed by the player');
         return false;
       }
       warpList(origin.player);
@@ -415,11 +415,11 @@ mc.listen('onServerStarted', () => {
   if (file.exists(oldConfPath)) {
     setWarpConf(new JsonConfigFile(oldConfPath).get('wraps'));
     file.rename(oldConfPath, `${confDir}/warps_old.json`);
-    logger.info('旧的插件数据迁移完毕');
+    logger.info('Old plug-in data migration completed');
   }
 })();
 
-ll.registerPlugin(pluginName, '公共坐标点', [0, 2, 2], {
+ll.registerPlugin(pluginName, 'public coordinate point', [0, 2, 2], {
   Author: 'student_2333',
   License: 'Apache-2.0',
 });
